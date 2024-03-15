@@ -1,0 +1,33 @@
+version: "3.9"
+  
+services:
+  console:
+    image: nl2sqlapp
+    build:
+      context: .
+    container_name: NL2SQLApp_console
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_NAME: ${DATABASE_NAME:-DB}
+      DATABASE_USER: ${DATABASE_USER:-USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-PASSWORD}
+      DATABASE_HOST: ${DATABASE_HOST:-db}
+      DJANGO_SECRET_KEY: ${DJANGO_SETTINGS_MODULE}
+  
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-PASSWORD}
+      POSTGRES_USER: ${DATABASE_USER:-USER}
+      POSTGRES_DB: ${DATABASE_NAME:-DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: on-failure
+
+volumes:
+  pgdata:
