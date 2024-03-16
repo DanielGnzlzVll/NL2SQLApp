@@ -20,6 +20,7 @@ services:
       DATABASE_HOST: ${DATABASE_HOST:-db}
       DJANGO_SECRET_KEY: ${DJANGO_SETTINGS_MODULE}
       MODEL_SERVER_ENDPOINT: ${MODEL_SERVER_ENDPOINT:-http://model_server:11434}
+      AVAILABLE_MODELS: ${AVAILABLE_MODELS:-llama2}
   
   db:
     image: postgres
