@@ -7,6 +7,7 @@ from django.core.management.base import CommandError
 from django.urls import reverse
 from model_bakery import baker
 
+from core import services
 from core.models import TeslaStockData
 
 
@@ -85,3 +86,27 @@ class TestResolveQueryView:
 
         assert response.status_code == 200
         assert response.json() == expected_response
+
+
+class TestDjangoQueryExecutor:
+
+    @pytest.mark.django_db
+    def test_execute(self):
+        baker.make("core.TeslaStockData", _quantity=3)
+        sql = "SELECT count(*) as my_count FROM core_teslastockdata"
+
+        response = services.DjangoQueryExecutor().execute(sql)
+
+        assert response == [{"my_count": 3}]
+
+    @pytest.mark.xfail(reason="Django transactions do not work currently with raw queries.")
+    @pytest.mark.django_db
+    def test_transaction(self):
+        baker.make("core.TeslaStockData", _quantity=3)
+        sql = "DELETE FROM core_teslastockdata"
+
+        response = services.DjangoQueryExecutor().execute(sql)
+
+        assert response == []
+
+        assert TeslaStockData.objects.count() == 3
