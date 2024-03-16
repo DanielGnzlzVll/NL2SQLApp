@@ -17,6 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from core.views import resolve_query
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/v1/resolve_query/', resolve_query, name="resolve_query"),
 ]

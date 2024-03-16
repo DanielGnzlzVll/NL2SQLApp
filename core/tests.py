@@ -1,9 +1,11 @@
-from unittest import mock
 from io import StringIO
+from unittest import mock
 
 import pytest
 from django.core.management import call_command
 from django.core.management.base import CommandError
+from django.urls import reverse
+from model_bakery import baker
 
 from core.models import TeslaStockData
 
@@ -44,7 +46,7 @@ class TestLoadData:
     @pytest.mark.django_db
     @mock.patch("core.management.commands.load_data.os.path.exists")
     def test_overwrite_data(self, mock_path_exists, mock_csv_file):
-        call_command("load_data", "test.csv")        
+        call_command("load_data", "test.csv")
         # ensure data is different to what is in the csv.
         TeslaStockData.objects.all().update(open=0)
         old_stock_data = dict(TeslaStockData.objects.all().values_list("date", "open"))
@@ -54,3 +56,32 @@ class TestLoadData:
 
         assert old_stock_data != new_stock_data
 
+
+class TestResolveQueryView:
+
+    def test_params_no_provided(self, client):
+        response = client.get(reverse("resolve_query"))
+
+        assert response.status_code == 400
+        assert response.json() == {"error": "No query provided."}
+
+    def test_url(self):
+        url = reverse("resolve_query")
+        assert url == "/api/v1/resolve_query/"
+
+    @pytest.mark.django_db
+    def test_happy_path(self, client):
+        baker.make("core.TeslaStockData", _quantity=3)
+
+        oldest_data = TeslaStockData.objects.order_by("date").first()
+        expected_response = {
+            "response": [{"date": str(oldest_data.date), "close": oldest_data.close}]
+        }
+
+        response = client.get(
+            reverse("resolve_query"),
+            {"q": "Please give me the oldest data, include date and close fields."},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == expected_response
