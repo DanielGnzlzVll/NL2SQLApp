@@ -28,7 +28,7 @@ class DummySqlGenerator(AbstractSqlGenerator):
         return """
             SELECT date, close
             FROM core_teslastockdata
-            ORDER BY date ASC
+            ORDER BY date DESC
             LIMIT 1
         """
 

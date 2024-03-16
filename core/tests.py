@@ -74,7 +74,7 @@ class TestResolveQueryView:
     def test_happy_path(self, client):
         baker.make("core.TeslaStockData", _quantity=3)
 
-        oldest_data = TeslaStockData.objects.order_by("date").first()
+        oldest_data = TeslaStockData.objects.order_by("-date").first()
         expected_response = {
             "response": [{"date": str(oldest_data.date), "close": oldest_data.close}]
         }
@@ -134,7 +134,7 @@ class TestQueryResolver:
             (
                 None,
                 None,
-                services.DummySqlGenerator,
+                services.OllamaSqlGenerator,
                 services.DjangoQueryExecutor,
             ),
             (
