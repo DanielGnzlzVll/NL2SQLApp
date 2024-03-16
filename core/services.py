@@ -103,7 +103,7 @@ class QueryResolver:
         query_executor: AbstractQueryExecutor | None = None
     ) -> None:
         if sql_generator is None:
-            self.sql_generator = DummySqlGenerator()
+            self.sql_generator = OllamaSqlGenerator()
         else:
             self.sql_generator = sql_generator
 

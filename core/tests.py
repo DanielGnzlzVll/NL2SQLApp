@@ -81,7 +81,7 @@ class TestResolveQueryView:
 
         response = client.get(
             reverse("resolve_query"),
-            {"q": "Please give me the oldest data, include date and close fields."},
+            {"q": "Please give only the date and close price of the record with the oldest date."},
         )
 
         assert response.status_code == 200
