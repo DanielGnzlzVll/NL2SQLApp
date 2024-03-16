@@ -87,6 +87,18 @@ class TestResolveQueryView:
         assert response.status_code == 200
         assert response.json() == expected_response
 
+    @mock.patch("core.services.QueryResolver")
+    def test_query_resolver_is_used(self, mock_query_resolver, client):
+
+        mock_query_resolver.return_value.resolve.return_value = {"random": "data"}
+
+        response = client.get(
+            reverse("resolve_query"),
+            {"q": "Please give me the oldest data, include date and close fields."},
+        )
+
+        assert response.json() == mock_query_resolver.return_value.resolve.return_value
+
 
 class TestDjangoQueryExecutor:
 
