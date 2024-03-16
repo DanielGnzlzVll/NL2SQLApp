@@ -36,9 +36,9 @@ Follow these steps to set up and run the application:
 
 3. **Start the web server**:
     After ensuring everything is properly set up, initiate the web server by running:
-        ```bash
-        make runserver
-        ```
+    ```bash
+    make runserver
+    ```
 
 
 ## Testing
@@ -54,13 +54,14 @@ To test the application, follow these steps:
    by default the first model will be use, you can choose another model by passing
    the query parameter model, for instance: http://localhost:8000/api/v1/resolve_query/?q=XXX&model=mistral
 
-    > [!WARNING]
-    > Don't forget pulling the models by running the `make start` command once you have changed the models list.
-    ```bash
-    export AVAILABLE_MODELS=llama2,mistral
-    make start
-    make runserver
-    ```
+> [!WARNING]
+> Don't forget pulling the models by running the `make start` command once you have changed the models list.
+
+```bash
+export AVAILABLE_MODELS=llama2,mistral
+make start
+make runserver
+```
 
 ## Project decisions:
 This project has the following decisions or conditions:
