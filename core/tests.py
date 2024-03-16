@@ -99,7 +99,9 @@ class TestDjangoQueryExecutor:
 
         assert response == [{"my_count": 3}]
 
-    @pytest.mark.xfail(reason="Django transactions do not work currently with raw queries.")
+    @pytest.mark.xfail(
+        reason="Django transactions do not work currently with raw queries."
+    )
     @pytest.mark.django_db
     def test_transaction(self):
         baker.make("core.TeslaStockData", _quantity=3)
@@ -110,3 +112,74 @@ class TestDjangoQueryExecutor:
         assert response == []
 
         assert TeslaStockData.objects.count() == 3
+
+
+class TestQueryResolver:
+
+    @pytest.mark.parametrize(
+        "sql_generator, query_executor, expected_sql_generator, expected_query_executor",
+        [
+            (
+                None,
+                None,
+                services.DummySqlGenerator,
+                services.DjangoQueryExecutor,
+            ),
+            (
+                mock.Mock(spec=services.AbstractSqlGenerator),
+                mock.Mock(spec=services.AbstractQueryExecutor),
+                mock.Mock,
+                mock.Mock,
+            ),
+        ],
+    )
+    def test_init(
+        self,
+        sql_generator,
+        query_executor,
+        expected_sql_generator,
+        expected_query_executor,
+    ):
+
+        resolver = services.QueryResolver(
+            sql_generator=sql_generator,
+            query_executor=query_executor,
+        )
+
+        assert isinstance(resolver.sql_generator, expected_sql_generator)
+        assert isinstance(resolver.query_executor, expected_query_executor)
+
+    def test_resolve(self):
+        mock_query = mock.Mock()
+        mock_sql_generator = mock.Mock(spec=services.AbstractSqlGenerator)
+        mock_query_executor = mock.Mock(spec=services.AbstractQueryExecutor)
+
+        resolver = services.QueryResolver(
+            sql_generator=mock_sql_generator,
+            query_executor=mock_query_executor,
+        )
+        response = resolver.resolve(mock_query)
+
+        assert response == {"response": mock_query_executor.execute.return_value}
+
+        assert mock_sql_generator.generate_sql.call_once_with(mock_query)
+        assert mock_query_executor.execute.call_once_with(
+            mock_sql_generator.generate_sql.return_value
+        )
+
+    def test_resolve_with_error(self):
+        mock_query = mock.Mock()
+        mock_sql_generator = mock.Mock(spec=services.AbstractSqlGenerator)
+        mock_query_executor = mock.Mock(spec=services.AbstractQueryExecutor)
+        mock_query_executor.execute.side_effect = Exception("Test error")
+
+        resolver = services.QueryResolver(
+            sql_generator=mock_sql_generator,
+            query_executor=mock_query_executor,
+        )
+        response = resolver.resolve(mock_query)
+
+        assert response == {
+            "error": "Test error",
+            "attempted_query": mock_sql_generator.generate_sql.return_value,
+        }

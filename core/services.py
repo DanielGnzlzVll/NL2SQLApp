@@ -41,3 +41,32 @@ class DjangoQueryExecutor(AbstractQueryExecutor):
             except CodeExecuted:
                 return data
 
+
+class QueryResolver:
+    sql_generator: AbstractSqlGenerator
+    query_executor: AbstractQueryExecutor
+
+    def __init__(
+        self,
+        *,
+        sql_generator: AbstractSqlGenerator | None = None,
+        query_executor: AbstractQueryExecutor | None = None
+    ) -> None:
+        if sql_generator is None:
+            self.sql_generator = DummySqlGenerator()
+        else:
+            self.sql_generator = sql_generator
+
+        if query_executor is None:
+            self.query_executor = DjangoQueryExecutor()
+        else:
+            self.query_executor = query_executor
+
+    def resolve(self, query: str) -> dict:
+        sql = self.sql_generator.generate_sql(query)
+        try:
+            query_response = self.query_executor.execute(sql)
+            response = {"response": query_response}
+        except Exception as e:
+            response = {"error": str(e), "attempted_query": sql}
+        return response
