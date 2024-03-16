@@ -48,4 +48,23 @@ To test the application, follow these steps:
 1. **Access the application**:
    - Open a web browser and navigate to http://localhost:8000/api/v1/resolve_query/?q=XXX, replacing XXX with your actual question.
 
+1. **Choosing the model**:
+   - You use can another model by setting the environment variable `AVAILABLE_MODELS`
+   for example you can set it to `llama2,mistral`
+   by default the first model will be use, you can choose another model by passing
+   the query parameter model, for instance: http://localhost:8000/api/v1/resolve_query/?q=XXX&model=mistral
 
+    > [!WARNING]
+    > Don't forget pulling the models by running the `make start` command once you have changed the models list.
+    ```bash
+    export AVAILABLE_MODELS=llama2,mistral
+    make start
+    make runserver
+    ```
+
+## Project decisions:
+This project has the following decisions or conditions:
+
+1. Django is use since it is easy to create the database schema and maintain its changes.
+1. No async code is used because django does not support async code for transactions currently.
+1. Ollama is used because it provided a wide variety of models, and i can be change to OpenIA's api easily.
