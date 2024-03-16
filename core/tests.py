@@ -195,3 +195,59 @@ class TestQueryResolver:
             "error": "Test error",
             "attempted_query": mock_sql_generator.generate_sql.return_value,
         }
+
+
+class TestOllamaSqlGenerator:
+
+    @pytest.mark.parametrize(
+        "query, expected_response",
+        [
+            (
+                "give the maximum close price",
+                ' SELECT MAX("core_teslastockdata".close)',
+            ),
+            (
+                "give the minimum close price",
+                " SELECT MIN(close) FROM core_teslastockdata;",
+            ),
+            (
+                "I want the most recent date in the format YYYY-MM-DD",
+                ' SELECT DATEADD(DAY, 0, "core_teslastockdata".date) AS most_recent_date;',
+            ),
+        ],
+    )
+    def test_happy(self, query, expected_response):
+
+        generator = services.OllamaSqlGenerator()
+        sql = generator.generate_sql(query)
+        assert sql == expected_response
+
+    @mock.patch("core.services.ollama.Client")
+    def test_chat_args(self, mock_client):
+
+        generator = services.OllamaSqlGenerator()
+        response = generator._chat("test")
+
+        mock_client.return_value.chat.assert_called_with(
+            model="llama2",
+            options={"seed": 123, "temperature": 0},
+            messages=[
+                {
+                    "role": "user",
+                    "content": "test",
+                },
+            ],
+        )
+
+        assert (
+            response == mock_client.return_value.chat.return_value["message"]["content"]
+        )
+
+    @mock.patch("core.services.TABLE_SCHEMA")
+    def test_get_message(self, mock_table_schema):
+        mock_query = mock.Mock()
+        generator = services.OllamaSqlGenerator()
+        message = generator._get_message(mock_query)
+
+        assert str(mock_table_schema) in message
+        assert str(mock_query) in message

@@ -3,3 +3,4 @@ psycopg2-binary==2.9.9
 pytest==8.1.1
 pytest-django==4.8.0
 model-bakery==1.17.0
+ollama==0.1.7
