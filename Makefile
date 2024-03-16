@@ -25,6 +25,13 @@ runserver: up
 stop: ## stop Docker containers without removing them
 	@docker compose stop || true
 
+.PHONY: start
+start: ## setup the dabase and download the models.
+start: COMMAND = python manage.py migrate --no-input
+start: up
+start: COMMAND = python manage.py pull_models
+start: up
+
 .PHONY: down
 down: ## Stop and remove all the containers
 	@docker compose down --remove-orphans

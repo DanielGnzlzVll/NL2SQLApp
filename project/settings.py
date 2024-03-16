@@ -133,3 +133,5 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MODEL_SERVER_ENDPOINT = os.environ["MODEL_SERVER_ENDPOINT"]
+
+AVAILABLE_MODELS = os.environ.get("AVAILABLE_MODELS", "llama2").split(",")
