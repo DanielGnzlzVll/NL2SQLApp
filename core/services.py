@@ -35,13 +35,14 @@ class DummySqlGenerator(AbstractSqlGenerator):
 
 class OllamaSqlGenerator(AbstractSqlGenerator):
 
-    def __init__(self) -> None:
+    def __init__(self, model) -> None:
         super().__init__()
+        self.model = model
         self.ollama = ollama.Client(host=settings.MODEL_SERVER_ENDPOINT)
 
     def _chat(self, message: str) -> str:
         response = self.ollama.chat(
-            model="llama2",
+            model=self.model,
             options={
                 "seed": 123,
                 "temperature": 0
@@ -99,11 +100,16 @@ class QueryResolver:
     def __init__(
         self,
         *,
+        model: str | None = None,
         sql_generator: AbstractSqlGenerator | None = None,
         query_executor: AbstractQueryExecutor | None = None
     ) -> None:
+        if model is None:
+            model = settings.AVAILABLE_MODELS[0]
+        assert model in settings.AVAILABLE_MODELS, f"Invalid model: {model}"
+
         if sql_generator is None:
-            self.sql_generator = OllamaSqlGenerator()
+            self.sql_generator = OllamaSqlGenerator(model=model)
         else:
             self.sql_generator = sql_generator
 

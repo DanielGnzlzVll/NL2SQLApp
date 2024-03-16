@@ -81,7 +81,9 @@ class TestResolveQueryView:
 
         response = client.get(
             reverse("resolve_query"),
-            {"q": "Please give only the date and close price of the record with the oldest date."},
+            {
+                "q": "Please give only the date and close price of the record with the oldest date."
+            },
         )
 
         assert response.status_code == 200
@@ -94,9 +96,13 @@ class TestResolveQueryView:
 
         response = client.get(
             reverse("resolve_query"),
-            {"q": "Please give me the oldest data, include date and close fields."},
+            {
+                "q": "Please give me the oldest data, include date and close fields.",
+                "model": "random-model",
+            },
         )
 
+        mock_query_resolver.assert_called_once_with(model="random-model")
         assert response.json() == mock_query_resolver.return_value.resolve.return_value
 
 
@@ -161,6 +167,13 @@ class TestQueryResolver:
         assert isinstance(resolver.sql_generator, expected_sql_generator)
         assert isinstance(resolver.query_executor, expected_query_executor)
 
+    @pytest.mark.parametrize("model_name", ["random-model", "tesla-stock-data"])
+    def test_invalid_model(self, model_name, settings):
+        settings.AVAILABLE_MODELS = ["llama2"]
+
+        with pytest.raises(AssertionError):
+            services.QueryResolver(model=model_name)
+
     def test_resolve(self):
         mock_query = mock.Mock()
         mock_sql_generator = mock.Mock(spec=services.AbstractSqlGenerator)
@@ -218,18 +231,18 @@ class TestOllamaSqlGenerator:
     )
     def test_happy(self, query, expected_response):
 
-        generator = services.OllamaSqlGenerator()
+        generator = services.OllamaSqlGenerator(model="llama2")
         sql = generator.generate_sql(query)
         assert sql == expected_response
 
     @mock.patch("core.services.ollama.Client")
     def test_chat_args(self, mock_client):
 
-        generator = services.OllamaSqlGenerator()
+        generator = services.OllamaSqlGenerator(model="test-model")
         response = generator._chat("test")
 
         mock_client.return_value.chat.assert_called_with(
-            model="llama2",
+            model="test-model",
             options={"seed": 123, "temperature": 0},
             messages=[
                 {
@@ -246,7 +259,7 @@ class TestOllamaSqlGenerator:
     @mock.patch("core.services.TABLE_SCHEMA")
     def test_get_message(self, mock_table_schema):
         mock_query = mock.Mock()
-        generator = services.OllamaSqlGenerator()
+        generator = services.OllamaSqlGenerator(model="llama2")
         message = generator._get_message(mock_query)
 
         assert str(mock_table_schema) in message
