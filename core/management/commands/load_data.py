@@ -10,7 +10,7 @@ from django.db import transaction
 
 
 class Command(BaseCommand):
-    help = "Closes the specified poll for voting"
+    help = "Loads data from a csv file"
 
     def add_arguments(self, parser):
         parser.add_argument("file_path", type=str)
