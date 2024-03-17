@@ -5,7 +5,7 @@ services:
     image: nl2sqlapp
     build:
       context: .
-    container_name: NL2SQLApp_console
+    container_name: nl2sqlapp_console
     volumes:
       - .:/app
     ports:

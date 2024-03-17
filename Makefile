@@ -16,6 +16,13 @@ test: ## run the tests
 test: COMMAND = pytest
 test: up
 
+.PHONY: test-circleci
+test-circleci: ## run the tests and collect results
+test-circleci: COMMAND = pytest --junitxml=test-results/junit.xml
+test-circleci: up
+test-circleci:
+	@docker cp NL2SQLApp_console:/app/test-results/ test-results/
+
 .PHONY: runserver
 runserver: ## run the develoment web server
 runserver: COMMAND = python manage.py runserver 0.0.0.0:8000
