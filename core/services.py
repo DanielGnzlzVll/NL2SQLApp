@@ -120,9 +120,10 @@ class QueryResolver:
 
     def resolve(self, query: str) -> dict:
         sql = self.sql_generator.generate_sql(query)
+        response = {"query": query}
+        response["attempted_query"] = sql
         try:
-            query_response = self.query_executor.execute(sql)
-            response = {"response": query_response}
+            response["response"] = self.query_executor.execute(sql)
         except Exception as e:
-            response = {"error": str(e), "attempted_query": sql}
+            response["error"] = str(e)
         return response

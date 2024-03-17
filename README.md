@@ -40,8 +40,11 @@ Follow these steps to set up and run the application:
     make runserver
     ```
 
+## Testing the web page
 
-## Testing
+There is a web page which can be used to ask to the model. Just open a web browser and navigate to http://localhost:8000/chat/ and ask any question.
+
+## Testing the api
 
 To test the application, follow these steps:
 

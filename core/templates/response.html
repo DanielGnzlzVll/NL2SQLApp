@@ -1,0 +1,43 @@
+<div class="response" autofocus="true">
+    <p>You: <strong>{{ query }}</strong></p>
+    <p>System:</p>
+    {% if response %}
+        <table>
+            <thead>
+                <tr>
+                    {% for key in response.0.keys %}
+                        <th>{{ key }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in response %}
+                    <tr>
+                        {% for value in item.values %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% endif %}
+
+    {% if error %}
+        <table>
+            <thead>
+
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Error</th>
+                    <td>{{ error }}</td>
+                </tr>
+                <tr>
+                    <th>Attempted query</th>
+                    <td>{{ attempted_query }}</td>
+                </tr>
+            </tbody>
+        </table>
+    {% endif %}
+</div

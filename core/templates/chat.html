@@ -1,0 +1,177 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html data-theme="light" lang="es">
+  <meta name="description" content="NL2SQLApp" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="theme-color"
+    media="(prefers-color-scheme: dark)"
+    content="black"
+  />
+  <title>NL2SQLApp</title>
+  <script
+    src="https://unpkg.com/htmx.org@1.9.11"
+    integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
+    crossorigin="anonymous"
+  ></script>
+  <script src="https://unpkg.com/htmx.org@1.9.11/dist/ext/client-side-templates.js"></script>
+  <script src="https://unpkg.com/mustache@latest"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      background-color: #f7f7f7;
+      font-family: Arial, sans-serif;
+      margin: 0;
+    }
+
+    .chat {
+      display: flex;
+      flex-direction: column;
+      height: 90%;
+      width: 600px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .chat h3{
+      text-align: center;
+      height: 22px;
+      box-sizing: border-box;
+    }
+
+    .messages {
+      height: -webkit-fill-available;
+      padding: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column-reverse;
+      overflow: auto;    
+      max-height: calc(100% - 120px - 22px);
+    }
+
+    .form {
+      display: flex;
+      flex-direction: column;
+      min-height: 120px;
+      margin: 5px 0px 0px 0px;
+      padding: 10px 10px 0 10px;
+      box-sizing: border-box;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 0px 300px 300px rgba(0, 0, 0, 0.05);
+      box-sizing: border-box;
+    }
+
+    .model-choices,
+    .input-text {
+      margin: 3px 7px;
+    }
+
+    .form select {
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      outline: none;
+      background-color: #f7f7f7;
+      width: 100%;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .input-text button {
+      background-color: #c0c0c0;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      position: relative;
+      left: 530px;
+      top: -32px;
+      height: 26px;
+      width: 26px;
+      border: none;
+      border-radius: 7px;
+    }
+
+    .input-text input[type="text"] {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #f7f7f7;
+      width: -webkit-fill-available;
+    }
+
+    .response{
+        border-top: 3px solid rgba(182, 182, 182, 0.3);
+        margin-top: 20px;
+        transition: all 0.5s ease;
+    }
+
+    .response p {
+      text-align: left;
+      justify-content: left;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    th {
+      background-color: #f2f2f2;
+      color: #333;
+      font-weight: bold;
+      padding: 10px;
+      text-align: left;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    td {
+      padding: 10px;
+    }
+  </style>
+  <body hx-ext="client-side-templates">
+    <div class="chat">
+        <h3>CHATS</h3>
+      <div class="messages" id="messages">
+      </div>
+      <form
+        class="form"
+        hx-get="{% url 'resolve_query' %}"
+        hx-target="#messages"
+        hx-swap="afterbegin scroll:bottom"
+      >
+        <div class="model-choices">
+          <select name="model" id="model">
+            {% for model_name in available_models %}
+            <option value="{{ model_name }}">{{ model_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="input-text">
+          <input type="text" name="q" placeholder="Ask me something..." />
+          <button type="submit"><i class="fas fa-paper-plane"></i></button>
+        </div>
+        <input type="hidden" name="format" value="html" />
+      </form>
+    </div>
+  </body>
+</html>
