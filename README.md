@@ -43,6 +43,8 @@ Follow these steps to set up and run the application:
 ## Testing the web page
 
 There is a web page which can be used to ask to the model. Just open a web browser and navigate to http://localhost:8000/chat/ and ask any question.
+![image](https://github.com/DanielGnzlzVll/NL2SQLApp/assets/22230373/ec957d3f-285a-40f3-8ab2-1f08524b821e)
+
 
 ## Testing the api
 
