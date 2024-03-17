@@ -21,8 +21,9 @@ test-circleci: ## run the tests and collect results
 test-circleci: COMMAND = pytest --junitxml=test-results/junit.xml
 test-circleci: SERVICE = circle_ci_console
 test-circleci:
-	@docker compose run --name nl2sqlapp_console ${SERVICE} ${COMMAND} || true
-	@docker cp nl2sqlapp_console:/app/test-results/ test-results/
+	@docker compose run --name nl2sqlapp_console ${SERVICE} ${COMMAND} \
+		&& { echo "Command succeeded"; } \
+		|| { ret=$$?; echo "Command failed with exit code $$ret"; docker cp nl2sqlapp_console:/app/test-results/ test-results/; exit $$ret; }
 
 .PHONY: runserver
 runserver: ## run the develoment web server
