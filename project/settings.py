@@ -135,3 +135,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MODEL_SERVER_ENDPOINT = os.environ["MODEL_SERVER_ENDPOINT"]
 
 AVAILABLE_MODELS = os.environ.get("AVAILABLE_MODELS", "llama2").split(",")
+
+DOWNLOAD_MODELS_ON_FLY = os.environ.get("DOWNLOAD_MODELS_ON_FLY", "").split(",")
