@@ -19,6 +19,7 @@ RUN adduser \
     --uid "${UID}" \
     appuser
 
+RUN chown -R $USER:$USER /app
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
