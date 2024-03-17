@@ -225,15 +225,15 @@ class TestOllamaSqlGenerator:
         [
             (
                 "give the maximum close price",
-                ' SELECT MAX("core_teslastockdata".close)',
+                ' SELECT MAX("close") FROM core_teslastockdata;',
             ),
             (
                 "give the minimum close price",
-                " SELECT MIN(close) FROM core_teslastockdata;",
+                ' SELECT MIN("close") FROM core_teslastockdata;',
             ),
             (
                 "I want the most recent date in the format YYYY-MM-DD",
-                ' SELECT DATEADD(DAY, 0, "core_teslastockdata".date) AS most_recent_date;',
+                ' SELECT DATE(MAX("date")) AS most_recent_date;',
             ),
         ],
     )
