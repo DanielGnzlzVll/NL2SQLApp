@@ -15,15 +15,17 @@ RUN adduser \
     --gecos "" \
     --home "/app" \
     --shell "/sbin/nologin" \
+    --no-create-home \
     --uid "${UID}" \
     appuser
 
-USER appuser
+RUN chown appuser:appuser /app
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
     python -m pip install -r requirements.txt
 
+USER appuser
 COPY . .
 CMD bash
 EXPOSE 8000

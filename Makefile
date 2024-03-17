@@ -9,7 +9,7 @@ help:
 .PHONY: up
 up: export DJANGO_SETTINGS_MODULE ?= project.settings
 up: ## Run the container and jump into a
-	@docker compose --profile ${PROFILE} run ${DOCKER_RUN_ARGS} ${SERVICE} ${COMMAND}
+	@docker compose run ${DOCKER_RUN_ARGS} ${SERVICE} ${COMMAND}
 
 .PHONY: test
 test: ## run the tests
@@ -21,7 +21,7 @@ test-circleci: ## run the tests and collect results
 test-circleci: COMMAND = pytest --junitxml=test-results/junit.xml
 test-circleci: SERVICE = circle_ci_console
 test-circleci:
-	@docker compose --profile ${PROFILE} run --name nl2sqlapp_console ${DOCKER_RUN_ARGS} ${SERVICE} ${COMMAND}
+	@docker compose run --name nl2sqlapp_console ${DOCKER_RUN_ARGS} ${SERVICE} ${COMMAND}
 	@docker cp nl2sqlapp_console:/app/test-results/ test-results/
 
 .PHONY: runserver
