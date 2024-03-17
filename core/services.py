@@ -68,7 +68,8 @@ class OllamaSqlGenerator(AbstractSqlGenerator):
 
     def generate_sql(self, query: str) -> str:
         message = self._get_message(query)
-        sql = self._chat(message)
+        sql = self._chat(message).replace("\n", " ").replace("\\", "")
+        print(sql)
         return sql
 
 
