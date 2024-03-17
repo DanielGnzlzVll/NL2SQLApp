@@ -1,0 +1,23 @@
+version: 2.1
+jobs:
+  test:
+    docker:
+      - image: cimg/python:3.11
+    working_directory: /home/circleci/circleci
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: "Building images"
+          command: make build 
+      - run:
+          name: "running tests"
+          command: make test-circleci
+      - store_test_results:
+          path: test-results
+
+workflows:
+  build-deploy:
+    jobs:
+      - test
