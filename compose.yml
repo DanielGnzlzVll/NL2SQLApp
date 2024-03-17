@@ -21,6 +21,23 @@ services:
       DJANGO_SECRET_KEY: ${DJANGO_SETTINGS_MODULE}
       MODEL_SERVER_ENDPOINT: ${MODEL_SERVER_ENDPOINT:-http://model_server:11434}
       AVAILABLE_MODELS: ${AVAILABLE_MODELS:-llama2}
+
+  circle_ci_console:
+    image: nl2sqlapp
+    build:
+      context: .
+    container_name: circle_ci_console
+    depends_on:
+      - db
+      - model_server_ci
+    environment:
+      DATABASE_NAME: ${DATABASE_NAME:-DB}
+      DATABASE_USER: ${DATABASE_USER:-USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-PASSWORD}
+      DATABASE_HOST: ${DATABASE_HOST:-db}
+      DJANGO_SECRET_KEY: ${DJANGO_SETTINGS_MODULE}
+      MODEL_SERVER_ENDPOINT: ${MODEL_SERVER_ENDPOINT:-http://model_server_ci:11434}
+      AVAILABLE_MODELS: ${AVAILABLE_MODELS:-llama2}
   
   db:
     image: postgres
@@ -43,6 +60,10 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+
+  model_server_ci:
+    image: ollama/ollama:latest
+
 
 volumes:
   pgdata:

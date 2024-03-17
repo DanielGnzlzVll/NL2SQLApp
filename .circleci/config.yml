@@ -12,8 +12,11 @@ jobs:
           name: "Building images"
           command: make build 
       - run:
+          name: "starting app"
+          command: make start 
+      - run:
           name: "running tests"
-          command: make test
+          command: make test-circleci
       - store_test_results:
           path: test-results
 

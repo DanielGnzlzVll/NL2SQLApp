@@ -19,9 +19,10 @@ test: up
 .PHONY: test-circleci
 test-circleci: ## run the tests and collect results
 test-circleci: COMMAND = pytest --junitxml=test-results/junit.xml
-test-circleci: up
+test-circleci: SERVICE = circle_ci_console
 test-circleci:
-	@docker cp NL2SQLApp_console:/app/test-results/ test-results/
+	@docker compose --profile ${PROFILE} run --name nl2sqlapp_console ${DOCKER_RUN_ARGS} ${SERVICE} ${COMMAND}
+	@docker cp nl2sqlapp_console:/app/test-results/ test-results/
 
 .PHONY: runserver
 runserver: ## run the develoment web server
