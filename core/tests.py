@@ -73,16 +73,19 @@ class TestResolveQueryView:
     @pytest.mark.django_db
     def test_happy_path(self, client):
         baker.make("core.TeslaStockData", _quantity=3)
+        query = "Please give only the date and close price of the record with the oldest date."
 
         oldest_data = TeslaStockData.objects.order_by("-date").first()
         expected_response = {
+            "query": query,
+            "attempted_query": ' SELECT "date", "close" FROM core_teslastockdata ORDER BY "date" DESC LIMIT 1;',
             "response": [{"date": str(oldest_data.date), "close": oldest_data.close}]
         }
 
         response = client.get(
             reverse("resolve_query"),
             {
-                "q": "Please give only the date and close price of the record with the oldest date."
+                "q": query
             },
         )
 
@@ -185,7 +188,11 @@ class TestQueryResolver:
         )
         response = resolver.resolve(mock_query)
 
-        assert response == {"response": mock_query_executor.execute.return_value}
+        assert response == {
+            "query": mock_query,
+            "attempted_query": mock_sql_generator.generate_sql.return_value,
+            "response": mock_query_executor.execute.return_value
+        }
 
         assert mock_sql_generator.generate_sql.call_once_with(mock_query)
         assert mock_query_executor.execute.call_once_with(
@@ -205,6 +212,7 @@ class TestQueryResolver:
         response = resolver.resolve(mock_query)
 
         assert response == {
+            "query": mock_query,
             "error": "Test error",
             "attempted_query": mock_sql_generator.generate_sql.return_value,
         }
