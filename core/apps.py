@@ -11,4 +11,5 @@ class CoreConfig(AppConfig):
     def ready(self):
         client = ollama.Client(host=settings.MODEL_SERVER_ENDPOINT)
         for model in settings.DOWNLOAD_MODELS_ON_FLY:
-            client.pull(model)
+            if model in settings.AVAILABLE_MODELS:
+                client.pull(model)
